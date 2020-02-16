@@ -73,7 +73,7 @@ if it has possible value do `step 3` and if it's not do `step 4` and loop the it
 
 Backtracking is brute-force so please don't use it when time complexity is realy matter for you, I just implement it from this [wiki](https://en.wikipedia.org/wiki/Sudoku_solving_algorithms#Backtracking). Fell free to change the initate sudoku grid or change it's size, but make sure that is has to be `quadratic integer` or you can modify the algorithm so that it's can find the solution of soduku with `n X m` dimension, whatever.
 
-## Run the programm
+## Run the code
 
 ```
 go run main.go
