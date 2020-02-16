@@ -9,13 +9,21 @@ import (
 )
 
 func main() {
-	sdk := model.InitGrid()
+	sdk := model.Build(
+		model.Sudoku{
+			IsSolvable:   true,  // `false` value will build sudoku with no solution
+			IsStepByStep: false, // if you wanna see step by step, change it into `true`
+		},
+	)
+
+	fmt.Println("Initial Sudoku Grid")
 	sdk.PrintGrid()
+	fmt.Println("Press Enter")
+	fmt.Scanln()
 
 	sdk.InitIndex()
 	sdk = Backtracking(sdk, false)
 
-	fmt.Scanln()
 	clearConsole()
 
 	if sdk.I == 0 {
@@ -31,7 +39,11 @@ func Backtracking(sdk model.Sudoku, backward bool) model.Sudoku {
 	if backward {
 		minValue = sdk.GetValue(sdk.I, sdk.J) + 1
 	}
-	fmt.Scanln()
+
+	if sdk.IsStepByStep {
+		fmt.Scanln()
+	}
+
 	clearConsole()
 
 	value = sdk.PickPossibleValue(sdk.I, sdk.J, minValue)
@@ -71,7 +83,7 @@ func clearConsole() {
 }
 
 func printSuccess(sdk model.Sudoku) {
-	fmt.Println("---init---")
+	fmt.Println("---initial---")
 	sdk.PrintSudokuZero()
 
 	fmt.Println()
@@ -81,7 +93,7 @@ func printSuccess(sdk model.Sudoku) {
 }
 
 func printFailed(sdk model.Sudoku) {
-	fmt.Println("---init---")
+	fmt.Println("---initial---")
 	sdk.PrintSudokuZero()
 
 	fmt.Println()

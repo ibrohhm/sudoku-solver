@@ -2,41 +2,33 @@ package sudoku
 
 import (
 	"fmt"
+	"math"
 )
 
 type Sudoku struct {
-	I    int     `json:"i"` // index of current row (algorithm purpose)
-	J    int     `json:"j"` // index of current column (algorithm purpose)
-	Size int     `json:"size"`
-	Grid [][]int `json:"grid"`
+	I            int     `json:"i"` // index of current row (algorithm purpose)
+	J            int     `json:"j"` // index of current column (algorithm purpose)
+	Size         int     `json:"size"`
+	Grid         [][]int `json:"grid"`
+	IsSolvable   bool    `json:"is_solvable"`
+	IsStepByStep bool    `json:"is_step_by_step"`
 }
 
 var sudokuZero Sudoku
 
-func InitGrid() Sudoku {
-	// grid := [][]int{
-	// 	[]int{1, 0, 0, 4},
-	// 	[]int{0, 2, 0, 0},
-	// 	[]int{0, 0, 0, 0},
-	// 	[]int{0, 0, 0, 0},
-	// }
+func Build(sdk Sudoku) Sudoku {
+	grid := initiateGrid(sdk.IsSolvable)
 
-	grid := [][]int{
-		[]int{1, 0, 0, 4},
-		[]int{0, 0, 2, 0},
-		[]int{0, 0, 0, 0},
-		[]int{0, 0, 3, 0},
+	sdk = Sudoku{
+		I:          0,
+		J:          0,
+		Size:       9, // it's must be quadratic integer
+		Grid:       grid,
+		IsSolvable: sdk.IsSolvable,
 	}
 
-	sudoku := Sudoku{
-		I:    0,
-		J:    0,
-		Size: 4,
-		Grid: grid,
-	}
-
-	saveSudokuZero(sudoku)
-	return sudoku
+	saveSudokuZero(sdk)
+	return sdk
 }
 
 func (m *Sudoku) PrintGrid() {
@@ -102,22 +94,6 @@ func (m *Sudoku) PickPossibleValue(i int, j int, minValue int) int {
 	return 0
 }
 
-func (m *Sudoku) ChangePossibleValue(i int, j int) int {
-	value := 0
-	curValue := m.GetValue(i, j)
-	if curValue > m.Size {
-		return 0
-	}
-
-	for d := curValue + 1; d <= m.Size; d++ {
-		if m.isPossible(i, j, d) && m.isNull(i, j) {
-			return d
-		}
-	}
-
-	return value
-}
-
 func (m *Sudoku) SetValue(i int, j int, value int) {
 	m.Grid[i][j] = value
 }
@@ -170,5 +146,50 @@ func (m *Sudoku) notPossibleValues(i int, j int) Array {
 		}
 	}
 
+	dim := int(math.Sqrt(float64(m.Size)))
+
+	ii := (i / dim) * dim
+	jj := (j / dim) * dim
+
+	for k := ii; k < ii+dim; k++ {
+		for l := jj; l < jj+dim; l++ {
+			boxValue := m.GetValue(k, l)
+			if boxValue != 0 {
+				values = append(values, boxValue)
+			}
+		}
+	}
+
 	return values.Distinct()
+}
+
+func initiateGrid(isSolvable bool) [][]int {
+	grid := [][]int{}
+
+	if isSolvable {
+		grid = [][]int{
+			[]int{5, 3, 0, 0, 7, 0, 0, 0, 0},
+			[]int{6, 0, 0, 1, 9, 5, 0, 0, 0},
+			[]int{0, 9, 8, 0, 0, 0, 0, 6, 0},
+			[]int{8, 0, 0, 0, 6, 0, 0, 0, 3},
+			[]int{4, 0, 0, 8, 0, 3, 0, 0, 1},
+			[]int{7, 0, 0, 0, 2, 0, 0, 0, 6},
+			[]int{0, 6, 0, 0, 0, 0, 2, 8, 0},
+			[]int{0, 0, 0, 4, 1, 9, 0, 0, 5},
+			[]int{0, 0, 0, 0, 8, 0, 0, 7, 9},
+		}
+	} else {
+		grid = [][]int{
+			[]int{5, 3, 0, 0, 7, 0, 0, 0, 0},
+			[]int{6, 0, 0, 1, 9, 5, 0, 0, 0},
+			[]int{0, 9, 8, 0, 0, 0, 0, 6, 0},
+			[]int{8, 0, 0, 0, 6, 0, 0, 0, 3},
+			[]int{4, 0, 0, 8, 0, 3, 0, 0, 1},
+			[]int{7, 0, 0, 0, 2, 0, 0, 0, 6},
+			[]int{0, 6, 0, 0, 0, 0, 2, 8, 0},
+			[]int{0, 0, 0, 4, 1, 9, 0, 0, 5},
+			[]int{7, 0, 0, 0, 8, 0, 0, 7, 9},
+		}
+	}
+	return grid
 }
